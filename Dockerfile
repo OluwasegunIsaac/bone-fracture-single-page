@@ -9,12 +9,18 @@ ENV PYTHONUNBUFFERED=1
 ENV APP_HOME /app
 WORKDIR $APP_HOME
 
+# Install system dependencies for OpenCV (if needed) and others
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy requirements.txt before other files to leverage Docker cache
-COPY requirements.txt ./
+COPY requirements.txt .
 
-# Install production dependencies
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
-
 # Copy the rest of the application code
 COPY . .
 
