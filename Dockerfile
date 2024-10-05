@@ -1,34 +1,27 @@
-# Use the official lightweight Python image.
+# Use official Python slim image
 FROM python:3.9-slim
 
-# Allow statements and log messages to immediately appear in the logs
-ENV PYTHONUNBUFFERED=1
+# Set working directory
+WORKDIR /app
 
-# Set the working directory
-ENV APP_HOME /app
-WORKDIR $APP_HOME
-
-# Install system dependencies for OpenCV and others
+# Install system dependencies for OpenCV (if needed) and others
 RUN apt-get update && apt-get install -y \
     libgl1-mesa-glx \
     libglib2.0-0 \
-    libsm6 \
-    libxrender1 \
-    libxext6 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements.txt before other files to leverage Docker cache
 COPY requirements.txt .
 
-# Install Python dependencies
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application code
+# Copy all application files (including pages/ directory)
 COPY . .
 
-# Expose the port the app runs on
+# Expose port
 EXPOSE 8080
 
 # Command to run the application
-CMD ["streamlit", "run", "app.py", "--server.port", "8080", "--server.enableCORS", "false"]
+CMD ["streamlit", "run", "main.py", "--server.address", "0.0.0.0", "--server.port", "8080"]
